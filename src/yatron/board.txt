@@ -211,4 +211,26 @@ If the two players are adjacent, the result is zero.
     >>> board.distance
     0
 
-    >>> board.path is None
+To calculate one of the shortest paths between us and the opponent, we can use
+the :attr:`yatron.board.Board.path` property.
+
+    >>> board.path
+    ()
+
+    >>> file = StringIO("""
+    ... 14 10
+    ... ##############
+    ... ###         ##
+    ... #  #    #  2 #
+    ... #   ######   #
+    ... #       #    #
+    ... #    #       #
+    ... #   ######   #
+    ... # 1  #    #  #
+    ... ##         ###
+    ... ##############
+    ... """)
+
+    >>> board = plaintext(file)
+    >>> board.path
+    ((2, 3), (2, 4), (2, 5), ..., (10, 5), (10, 6), (10, 7))

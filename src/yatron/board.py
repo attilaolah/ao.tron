@@ -22,7 +22,8 @@ class Board(object):
         self.__board = \
             self.__me = \
             self.__them = \
-            self.__distance = None
+            self.__distance = \
+            self.__path = None
 
     @property
     def board(self):
@@ -86,7 +87,8 @@ class Board(object):
         if self.__distance is None:
             x, y = self.me
             if self.them in ((x, y-1), (x, y+1), (x-1, y), (x+1, y)):
-                self.__distance = 0
+                # We're adjacent; set cache to zero and path to empty.
+                self.__distance, self.__path = 0, ()
                 return 0
             borders = self.possibilities(self.them)
             fields, flood, levels, counter, space = [self.me], [], [], 1, 0
@@ -105,7 +107,7 @@ class Board(object):
                                     if field in self.possibilities(path[-1]):
                                         path.append(field)
                                         continue
-                            self.path = tuple(reversed(path))
+                            self.__path = tuple(reversed(path))
                             # Return the current distance.
                             return counter
                         if x not in flood:
@@ -114,8 +116,8 @@ class Board(object):
                 counter += 1
                 space += len(next)
                 if next == []:
-                    # No more spaces left: we are isolated.
-                    self.__distance = -1
+                    # No more spaces left: we are isolated; set up path cache.
+                    self.__distance, self.__path = -1, ()
                     # We also set our leftover space.
                     self.space = space
                     # Return -1 to indicate isolation.
@@ -123,3 +125,8 @@ class Board(object):
                 levels.append(next)
                 fields = next
         return self.__distance
+
+    @property
+    def path(self):
+        """Returns one of the shortest paths between us on the opponent."""
+        return (self.distance, self.__path)[1]
