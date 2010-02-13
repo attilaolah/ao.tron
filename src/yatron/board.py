@@ -30,6 +30,10 @@ class Board(object):
             self.__board = '\n'.join(''.join(line) for line in self.lines)
         return self.__board
 
+    def __repr__(self):
+        """Useful when debugging."""
+        return '<Board ({0}x{1})>'.format(*self.dimensions)
+
     def __iter__(self):
         """Iterates over the board, yielding block values and coordinates."""
         for y, line in enumerate(self.lines):

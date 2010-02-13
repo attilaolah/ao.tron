@@ -1,3 +1,6 @@
+# ignore dot-files
+.*
+
 # ignore python source files
 *.py[co]
 
@@ -6,4 +9,5 @@
 bin/
 develop-eggs/
 eggs/
+parts/
 src/yatron.egg-info/

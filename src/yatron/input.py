@@ -13,7 +13,7 @@ def plaintext(infile):
 
     """
 
-    raw = (line[:-1] for line in infile.readlines())
+    raw = (line[:-1] for line in infile.readlines() if line != '\n')
     dimensions = tuple((int(x) for x in raw.next().split()))
     # Note: we need to reverse in order to get the right coordination system.
     lines = tuple(reversed([tuple(line) for line in raw]))

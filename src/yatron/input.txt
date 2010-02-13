@@ -1,1 +1,53 @@
-FOO BAR
+Reading the board from a file
+=============================
+
+.. |yatron| replace:: :mod:`yatron`
+
+:func:`yatron.input.plaintext` is a simple function that reads the tron board
+from a file-like object and returns a :class:`yatron.board.Board` instance.
+Format the input like this::
+
+    5 5
+    #####
+    #  2#
+    #   #
+    #1  #
+    #####
+
+The numbers on the first line show the height and withd of the board,
+respectively. The following lines represent the board, where::
+
+* `"#"` are walls
+* `" "` (whitespaces) are the floor
+* `"1"` is our player
+* `"2"` is the opponent
+
+To use the function, you can pass it any file-like object, for example
+:mod:`sys.stdin`. In your source file, you can do something like this::
+
+    import sys
+    from tron.input import plaintext
+    board = plaintext(sys.stdin)
+
+and then pipe the board into the process like this::
+
+    $ python foobot.py < fooboard.txt
+
+For testing, we'll create a file-like object to demonstrate how it works::
+
+    >>> from StringIO import StringIO
+    >>> file = StringIO("""
+    ... 5 5
+    ... #####
+    ... #  2#
+    ... #   #
+    ... #1  #
+    ... #####
+    ... """)
+
+Now we can pass it to :func:`yatron.input.plaintext`::
+
+    >>> from yatron.input import plaintext
+    >>> board = plaintext(file)
+    >>> board
+    <Board (5x5)>
