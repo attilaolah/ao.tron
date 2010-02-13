@@ -85,8 +85,7 @@ class Board(object):
         """
         if self.__distance is None:
             borders = self.possibilities(self.them)
-            fields, counter = [self.me], 1
-            flood = []
+            fields, flood, counter = [self.me], [], 1
             while True:
                 next = []
                 for field in fields:
@@ -102,5 +101,4 @@ class Board(object):
                     self.__distance = -1
                     return -1
                 fields = next
-            # At this point, it looks like we're isolated.
         return self.__distance
