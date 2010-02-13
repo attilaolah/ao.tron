@@ -89,7 +89,7 @@ class Board(object):
                 self.__distance = 0
                 return 0
             borders = self.possibilities(self.them)
-            fields, flood, counter = [self.me], [], 1
+            fields, flood, counter, space = [self.me], [], 1, 0
             while True:
                 next = []
                 for field in fields:
@@ -101,8 +101,10 @@ class Board(object):
                             flood.append(x)
                             next.append(x)
                 counter += 1
+                space += len(next)
                 if next == []:
                     self.__distance = -1
+                    self.space = space
                     return -1
                 fields = next
         return self.__distance

@@ -189,6 +189,12 @@ Asking it the second time it should be slightly faster.
     >>> board.distance
     -1
 
+Note that if we're isolated, calling distance will also calculate our space
+left:
+
+    >>> board.space
+    35
+
 If the two players are adjacent, the result is zero.
 
     >>> file = StringIO("""
