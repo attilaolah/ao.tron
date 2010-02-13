@@ -1,2 +1,9 @@
 # ignore python source files
 *.py[co]
+
+# ignore files created by buildout
+.installed.cfg
+bin/
+develop-eggs/
+eggs/
+src/yatron.egg-info/

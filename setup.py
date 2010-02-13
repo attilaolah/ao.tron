@@ -20,6 +20,12 @@ setup(
     packages=find_packages('src'),
     include_package_data=True,
     zip_safe=True,
+    tests_requre=(
+        'zope.testing',
+    ),
+    extras_require={
+        'test': 'zope.testing',
+    },
     # Classifiers:
     classifiers=(
         'Development Status :: 3 - Alpha',
