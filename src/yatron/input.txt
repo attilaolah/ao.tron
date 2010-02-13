@@ -1,8 +1,6 @@
 Reading the board from a file
 =============================
 
-.. |yatron| replace:: :mod:`yatron`
-
 :func:`yatron.input.plaintext` is a simple function that reads the tron board
 from a file-like object and returns a :class:`yatron.board.Board` instance.
 Format the input like this::

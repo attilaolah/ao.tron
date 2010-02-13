@@ -27,7 +27,8 @@ class Board(object):
     def board(self):
         """Returns the tron board in plain text. Useful for debugging."""
         if self.__board is None:
-            self.__board = '\n'.join(''.join(line) for line in self.lines)
+            self.__board = '\n'.join(reversed([
+                ''.join(line) for line in self.lines]))
         return self.__board
 
     def __repr__(self):
