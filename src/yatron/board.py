@@ -7,6 +7,13 @@ class Board(object):
     M = ME    = '1'
     T = THEM  = '2'
 
+    # Directions:
+    NORTH = 1
+    EAST  = 2
+    SOUTH = 3
+    WEST  = 4
+    DIRECTIONS = (NORTH, EAST, SOUTH, WEST)
+
     def __init__(self, dimensions, lines, syntax=None):
         # Set up dimensions and lines (with height and withd for convenience):
         self.dimensions = \
@@ -72,8 +79,12 @@ class Board(object):
     def possibilities(self, coords):
         """Returns the coordinates of spaces around `coords`."""
         x, y = coords
-        area = ((x, y-1), (x, y+1), (x-1, y), (x+1, y))
+        area = ((x, y+1), (x+1, y), (x, y-1), (x-1, y))
         return tuple(block for block in area if self[block] == self.FLOOR)
+
+    def direction(self, coords):
+        """Returns the direction to go the the adjacent `coords`."""
+        return self.possibilities(self.me).index(coords) + 1
 
     @property
     def distance(self):

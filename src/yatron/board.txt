@@ -234,3 +234,12 @@ the :attr:`yatron.board.Board.path` property.
     >>> board = plaintext(file)
     >>> board.path
     ((2, 3), (2, 4), (2, 5), ..., (10, 5), (10, 6), (10, 7))
+
+To get directions for an adjacent coordinate, call
+:meth:`yatron.board.Board.direction`.
+
+    >>> board.direction((2, 3))
+    1
+
+    >>> board.direction((board.me[0]-1, board.me[1])) == board.WEST
+    True
