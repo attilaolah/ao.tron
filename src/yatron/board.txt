@@ -210,3 +210,5 @@ If the two players are adjacent, the result is zero.
     >>> board = plaintext(file)
     >>> board.distance
     0
+
+    >>> board.path is None
