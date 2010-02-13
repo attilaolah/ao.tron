@@ -6,3 +6,19 @@ include:: ../README.txt
    yatron/input
    yatron/board
    changes
+
+
+:mod:`yatron.input` module
+--------------------------
+
+.. automodule:: yatron.input
+
+  .. autofunc:: yatron.input.plaintext
+
+
+:mod:`yatron.board` module
+--------------------------
+
+.. automodule:: yatron.board
+
+  .. autoclass:: yatron.board.Board
