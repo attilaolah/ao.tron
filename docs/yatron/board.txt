@@ -1,0 +1,1 @@
+.. include:: ../../yatron/board.txt

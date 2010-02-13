@@ -20,11 +20,17 @@ setup(
     packages=find_packages('src'),
     include_package_data=True,
     zip_safe=True,
-    tests_requre=(
+    tests_require=(
         'zope.testing',
     ),
     extras_require={
-        'test': 'zope.testing',
+        'test': (
+            'zope.testing'
+        ),
+        'docs': (
+            'Sphinx',
+            'z3c.recipe.sphinxdoc',
+        ),
     },
     # Classifiers:
     classifiers=(

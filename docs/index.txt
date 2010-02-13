@@ -1,0 +1,8 @@
+include:: ../README.txt
+
+.. toctree::
+   :maxdepth: 2
+
+   yatron/input
+   yatron/board
+   changes
