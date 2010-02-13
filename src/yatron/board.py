@@ -89,13 +89,24 @@ class Board(object):
                 self.__distance = 0
                 return 0
             borders = self.possibilities(self.them)
-            fields, flood, counter, space = [self.me], [], 1, 0
+            fields, flood, levels, counter, space = [self.me], [], [], 1, 0
             while True:
                 next = []
                 for field in fields:
                     for x in self.possibilities(field):
                         if x in borders:
+                            # Fond the enemy: set cache to counter value.
                             self.__distance = counter
+                            # Also set the shortest path
+                            levels.reverse()
+                            path = [x]
+                            for level in levels:
+                                for field in level:
+                                    if field in self.possibilities(path[-1]):
+                                        path.append(field)
+                                        continue
+                            self.path = tuple(reversed(path))
+                            # Return the current distance.
                             return counter
                         if x not in flood:
                             flood.append(x)
@@ -103,8 +114,12 @@ class Board(object):
                 counter += 1
                 space += len(next)
                 if next == []:
+                    # No more spaces left: we are isolated.
                     self.__distance = -1
+                    # We also set our leftover space.
                     self.space = space
+                    # Return -1 to indicate isolation.
                     return -1
+                levels.append(next)
                 fields = next
         return self.__distance
