@@ -79,3 +79,9 @@ If we are expecting multipel boards, we can generate them with the utility
     <Board (5x5)>
     <Board (4x4)>
     <Board (4x4)>
+
+To make a move, we can use the :func:`yatron.move` function.
+
+    >>> from yatron import move
+    >>> move(board.NORTH)
+    1
