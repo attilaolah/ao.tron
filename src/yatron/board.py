@@ -71,7 +71,7 @@ class Board(object):
     def possibilities(self, coords):
         """Returns the coordinates of spaces around `coords`."""
         x, y = coords
-        area = ((x, y-1), (x, y+1), (x+1, y), (x-1, y))
+        area = ((x, y-1), (x, y+1), (x-1, y), (x+1, y))
         return tuple(block for block in area if self[block] == self.FLOOR)
 
     @property
@@ -84,6 +84,10 @@ class Board(object):
 
         """
         if self.__distance is None:
+            x, y = self.me
+            if self.them in ((x, y-1), (x, y+1), (x-1, y), (x+1, y)):
+                self.__distance = 0
+                return 0
             borders = self.possibilities(self.them)
             fields, flood, counter = [self.me], [], 1
             while True:

@@ -188,3 +188,19 @@ Asking it the second time it should be slightly faster.
 
     >>> board.distance
     -1
+
+If the two players are adjacent, the result is zero.
+
+    >>> file = StringIO("""
+    ... 14 10
+    ... #######
+    ... #     #
+    ... #  2  #
+    ... #  1  #
+    ... #     #
+    ... #######
+    ... """)
+
+    >>> board = plaintext(file)
+    >>> board.distance
+    0
