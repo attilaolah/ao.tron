@@ -21,7 +21,8 @@ class Board(object):
         # Set up some lazyness for the properties:
         self.__board = \
             self.__me = \
-            self.__them = None
+            self.__them = \
+            self.__distance = None
 
     @property
     def board(self):
@@ -66,3 +67,40 @@ class Board(object):
                     break
         return self.__them
     t = them
+
+    def possibilities(self, coords):
+        """Returns the coordinates of spaces around `coords`."""
+        x, y = coords
+        area = ((x, y-1), (x, y+1), (x+1, y), (x-1, y))
+        return tuple(block for block in area if self[block] == self.FLOOR)
+
+    @property
+    def distance(self):
+        """Calculates the distance between the two players.
+
+        If the players are isolated, returns None, otherwise the number of
+        blocks needed to travel from our position to the opponent's position,
+        minus one.
+
+        """
+        if self.__distance is None:
+            borders = self.possibilities(self.them)
+            fields, counter = [self.me], 1
+            flood = []
+            while True:
+                next = []
+                for field in fields:
+                    for x in self.possibilities(field):
+                        if x in borders:
+                            self.__distance = counter
+                            return counter
+                        if x not in flood:
+                            flood.append(x)
+                            next.append(x)
+                counter += 1
+                if next == []:
+                    self.__distance = -1
+                    return -1
+                fields = next
+            # At this point, it looks like we're isolated.
+        return self.__distance

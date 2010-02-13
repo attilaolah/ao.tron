@@ -113,3 +113,78 @@ If we iterate over the board, it will yield it's blocks and coordinates:
     2 (3, 3)
     ...
     # (4, 4)
+
+To check for possible moves from a certain position, we call
+:func:`yatron.board.Board.possibilities`.
+
+    >>> board.possibilities(me)
+    ((1, 2), (2, 1))
+
+    >>> board.possibilities(them)
+    ((3, 2), (2, 3))
+
+To check the distance between us and the opponent, we can use the
+:attr:`yatron.board.Board.distance` property.
+
+    >>> board.distance
+    3
+
+Let's try it with a more complex board:
+
+    >>> file = StringIO("""
+    ... 7 5
+    ... #######
+    ... #   #2#
+    ... # # # #
+    ... #1#   #
+    ... #######
+    ... """)
+
+    >>> board = plaintext(file)
+    >>> board.distance
+    9
+
+Or an even more complex one:
+
+    >>> file = StringIO("""
+    ... 14 10
+    ... ##############
+    ... #            #
+    ... #          2 #
+    ... #   ######   #
+    ... #   #    #   #
+    ... #   #    #   #
+    ... #   ######   #
+    ... # 1          #
+    ... #            #
+    ... ##############
+    ... """)
+
+    >>> board = plaintext(file)
+    >>> board.distance
+    13
+
+Let's try an isolated board:
+
+    >>> file = StringIO("""
+    ... 14 10
+    ... ##############
+    ... ###         ##
+    ... #  #    #  2 #
+    ... #   ######   #
+    ... #      #     #
+    ... #     #      #
+    ... #   ######   #
+    ... # 1  #    #  #
+    ... ##         ###
+    ... ##############
+    ... """)
+
+    >>> board = plaintext(file)
+    >>> board.distance
+    -1
+
+Asking it the second time it should be slightly faster.
+
+    >>> board.distance
+    -1
