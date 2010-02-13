@@ -19,3 +19,20 @@ def plaintext(infile):
     lines = tuple(reversed([tuple(line) for line in raw]))
 
     return Board(dimensions, lines)
+
+
+def genplaintext(infile):
+    """Reads tron boards from `infile`."""
+    while True:
+        dimensions = infile.readline()
+        if not dimensions:
+            # Check for end of input
+            raise StopIteration
+        while not dimensions.strip():
+            # Strip empty lines
+            dimensions = infile.readline()
+        (width, height), lines = map(int, dimensions.split()), []
+        for i in xrange(height):
+            lines.append(tuple(infile.readline()[:width]))
+        # Yield a new Board object for each iteration
+        yield Board((width, height), tuple(reversed(lines)))

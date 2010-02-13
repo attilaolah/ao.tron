@@ -243,3 +243,8 @@ To get directions for an adjacent coordinate, call
 
     >>> board.direction((board.me[0]-1, board.me[1])) == board.WEST
     True
+
+Thus, if we want to head towards the enemy, we can easily get directions:
+
+    >>> board.direction(board.path[0]) == board.NORTH
+    True

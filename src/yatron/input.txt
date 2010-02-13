@@ -3,7 +3,7 @@ Reading the board from a file
 
 :func:`yatron.input.plaintext` is a simple function that reads the tron board
 from a file-like object and returns a :class:`yatron.board.Board` instance.
-Format the input like this::
+Format the input like this:
 
     5 5
     #####
@@ -13,7 +13,7 @@ Format the input like this::
     #####
 
 The numbers on the first line show the height and withd of the board,
-respectively. The following lines represent the board, where::
+respectively. The following lines represent the board, where:
 
 * `"#"` are walls
 * `" "` (whitespaces) are the floor
@@ -21,17 +21,17 @@ respectively. The following lines represent the board, where::
 * `"2"` is the opponent
 
 To use the function, you can pass it any file-like object, for example
-:mod:`sys.stdin`. In your source file, you can do something like this::
+:mod:`sys.stdin`. In your source file, you can do something like this:
 
     import sys
     from tron.input import plaintext
     board = plaintext(sys.stdin)
 
-and then pipe the board into the process like this::
+and then pipe the board into the process like this:
 
     $ python foobot.py < fooboard.txt
 
-For testing, we'll create a file-like object to demonstrate how it works::
+For testing, we'll create a file-like object to demonstrate how it works:
 
     >>> from StringIO import StringIO
     >>> file = StringIO("""
@@ -43,9 +43,39 @@ For testing, we'll create a file-like object to demonstrate how it works::
     ... #####
     ... """)
 
-Now we can pass it to :func:`yatron.input.plaintext`::
+Now we can pass it to :func:`yatron.input.plaintext`:
 
     >>> from yatron.input import plaintext
     >>> board = plaintext(file)
     >>> board
     <Board (5x5)>
+
+If we are expecting multipel boards, we can generate them with the utility
+:func:`yatron.input.genplaintext` from plain text input.
+
+    >>> file = StringIO("""
+    ... 5 5
+    ... #####
+    ... #  2#
+    ... #   #
+    ... #1  #
+    ... #####
+    ... 4 4
+    ... ####
+    ... # 2#
+    ... #1 #
+    ... ####
+    ... 4 4
+    ... ####
+    ... #1 #
+    ... # 2#
+    ... ####
+    ... """)
+
+    >>> from yatron.input import genplaintext
+    >>> boards = genplaintext(file)
+    >>> for board in boards:
+    ...     print board
+    <Board (5x5)>
+    <Board (4x4)>
+    <Board (4x4)>
