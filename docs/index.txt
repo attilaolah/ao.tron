@@ -13,8 +13,6 @@ include:: ../README.txt
 
 .. automodule:: yatron.input
 
-  .. autofunc:: yatron.input.plaintext
-
 
 :mod:`yatron.board` module
 --------------------------
