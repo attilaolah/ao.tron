@@ -1,1 +1,1 @@
-.. include:: ../../yatron/board.txt
+.. include:: ../../src/yatron/board.txt
