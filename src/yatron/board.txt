@@ -100,3 +100,16 @@ it's `syntax` argument when creating the board:
 
     >>> fancy[fancy.them] == fancy.THEM
     True
+
+If we iterate over the board, it will yield it's blocks and coordinates:
+
+    >>> for block, coords in board:
+    ...     print block, coords
+    # (0, 0)
+    # (1, 0)
+    ...
+    1 (1, 1)
+    ...
+    2 (3, 3)
+    ...
+    # (4, 4)
