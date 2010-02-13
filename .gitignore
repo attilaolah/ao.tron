@@ -1,0 +1,2 @@
+# ignore python source files
+*.py[co]
