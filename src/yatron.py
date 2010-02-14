@@ -146,7 +146,7 @@ class Board(object):
 
     def __repr__(self):
         """Useful when debugging."""
-        return '<Board ({0}x{1})>'.format(*self.dimensions)
+        return '<Board (%dx%d)>' % self.dimensions
 
     def __iter__(self):
         """Iterates over the board, yielding block values and coordinates."""
@@ -195,7 +195,10 @@ class Board(object):
     def direction(self, coords):
         """Returns the direction to go the the adjacent `coords`."""
         if coords in self.surround(self.me):
-            return self.surround(self.me).index(coords) + 1
+            # XXX This is not compatible with Python 2.5, so we work it around:
+            # return self.surround(self.me).index(coords) + 1
+            return [i for i, x in enumerate(self.surround(
+                self.me)) if x == coords][0] + 1
 
     @property
     def distance(self):
