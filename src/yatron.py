@@ -1,5 +1,8 @@
 import os
+import random
 import sys
+
+from operator import gt, lt, sub
 
 
 DIRECTIONS = (NORTH, EAST, SOUTH, WEST) = (N, S, E, W) = 1, 2, 3, 4
@@ -89,17 +92,36 @@ def generate():
 
     """
 
-    buf = ''
-
+    from sys import stdin
     while True:
-        board, buf = read(buf)
-        if board is None:
-            break
+        #dimensions = stdin.readline()
+        #if not dimensions:
+        #    # Check for end of input
+        #    raise StopIteration
+        #while not dimensions.strip():
+        #    # Strip empty lines
+        #    dimensions = infile.readline()
+        (width, height), lines = map(int, stdin.readline().split()), []
+        for i in xrange(height):
+            lines.append(tuple(stdin.readline()[:width]))
+        # Yield a new Board object for each iteration
+        yield Board((width, height), tuple(reversed(lines)))
 
-        yield board
 
-    if buf.strip():
-        invalid('garbage after last board: %s' % buf)
+
+    # XXX
+
+#    buf = ''
+#
+#    while True:
+#        board, buf = read(buf)
+#        if board is None:
+#            break
+#
+#        yield board
+#
+#    if buf.strip():
+#        invalid('garbage after last board: %s' % buf)
 
 
 class Board(object):
@@ -134,7 +156,11 @@ class Board(object):
             self.__me = \
             self.__them = \
             self.__distance = \
-            self.__path = None
+            self.__path = \
+            self.__flight = \
+            self.__charge = \
+            self.__chase = \
+            self.__flee = None
 
     @property
     def board(self):
@@ -254,3 +280,98 @@ class Board(object):
     def path(self):
         """Returns one of the shortest paths between us on the opponent."""
         return (self.distance, self.__path)[1]
+
+    @property
+    def flight(self):
+        """Thsi is the absolute distance between us and the opponent.
+
+        Note that walls are not taken account of. We may even be separated.
+        This is just a cheap call to see if we're far away on a huge map.
+
+        """
+        if self.__flight is None:
+            self.__flight = sum(map(abs, map(sub, self.me, self.them)))
+        return self.__flight
+
+    @property
+    def chase(self):
+        """Chases the enemy.
+
+        Note that this will call `self.path`, which may be quite expensive on
+        huge boards. Use it with caution. If you need a cheaper version, try
+        `self.charge`.
+
+        """
+
+        if self.__chase is None:
+            self.__chase = self.path and self.path[0] or None
+        return self.__chase
+
+    @property
+    def charge(self):
+        """Charges towards the enemy.
+
+        This call is very cheap, but it does not check for the shortest path;
+        It doesn't even check if we're separated from the enemy or not. Use it
+        when you're far from the enemy and want to get closer as quickly as
+        possible.
+
+        """
+
+        if self.__charge is None:
+            x, y = self.me
+            xl, yl = map(lt, self.me, self.them)
+            fields = {
+                (True, True): ((x+1, y), (x, y+1), (x, y-1), (x-1, y)),
+                (True, False): ((x+1, y), (x, y-1), (x-1, y), (x, y+1)),
+                (False, True): ((x-1, y), (x, y+1), (x+1, y), (x, y-1)),
+                (False, False): ((x-1, y), (x, y-1), (x+1, y), (x, y+1)),
+            }[xl, yl]
+            for field in fields:
+                if field in self.possibilities(self.me):
+                    self.__charge = field
+                    return field
+
+            # It looks like we're trapped, so let's return None.
+            self.__charge = -1
+            return None
+        if self.__charge == -1:
+            return None
+        return self.__charge
+
+    @property
+    def flee(self):
+        """Flee from the enemy.
+
+        This call is very cheap, but it does not check for the shortest path;
+        It doesn't even check if we're separated from the enemy or not. Use it
+        when you want to run away as quickly as possible.
+
+        """
+
+        if self.__flee is None:
+            x, y = self.me
+            xg, yg = map(gt, self.me, self.them)
+            fields = {
+                (True, True): ((x+1, y), (x, y+1), (x, y-1), (x-1, y)),
+                (True, False): ((x+1, y), (x, y-1), (x-1, y), (x, y+1)),
+                (False, True): ((x-1, y), (x, y+1), (x+1, y), (x, y-1)),
+                (False, False): ((x-1, y), (x, y-1), (x+1, y), (x, y+1)),
+            }[xg, yg]
+            for field in fields:
+                if field in self.possibilities(self.me):
+                    self.__flee = field
+                    return field
+
+            # It looks like we're trapped, so let's return None.
+            self.__flee = -1
+            return None
+        if self.__flee == -1:
+            return None
+        return self.__flee
+
+    @property
+    def random(self):
+        """Returns a random valid move."""
+        return self.possibilities(self.me) and random.choice(
+            self.possibilities(self.me)) or self.surround(self.me)[0]
