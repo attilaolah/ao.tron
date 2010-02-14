@@ -1,14 +1,13 @@
 The tron board
 ==============
 
-The class :class:`yatron.board.Board` represents the state of the tron board
-in discrete time. It has some utility functions to make it easier for your bot
+The class :class:`yatronBoard` represents the state of the tron board in
+discrete time. It has some utility functions to make it easier for your bot
 to work with the board object. To construct a simple board object, we'll use
-the :func:`yatron.input.plaintext` function.
+the :func:`yatron.generate` generator.
 
     >>> from StringIO import StringIO
-    >>> file = StringIO("""
-    ... 5 5
+    >>> bfile = StringIO("""5 5
     ... #####
     ... #  2#
     ... #   #
@@ -16,15 +15,18 @@ the :func:`yatron.input.plaintext` function.
     ... #####
     ... """)
 
-    >>> from yatron.input import plaintext
-    >>> board = plaintext(file)
+    >>> import os
+    >>> os.read = lambda fd, n: bfile.read(n)
+
+    >>> from yatron import generate
+    >>> board = generate().next()
     >>> board
     <Board (5x5)>
 
 To see that we actually have the correct board, we can use the
-:attr:`yatron.board.Board.board` property. Note that this property is lazy, as
-are most other properties: they won't calculate the result unless you ask for
-it, and once calculated, they store it in the object for later use.
+:attr:`yatron.Board.board` property. Note that this property is lazy, as are
+most other properties: they won't calculate the result unless you ask for it,
+and once calculated, they store it in the object for later use.
 
     >>> print board.board
     #####
@@ -33,15 +35,15 @@ it, and once calculated, they store it in the object for later use.
     #1  #
     #####
 
-We can ask our coordinates using the :attr:`yatron.board.Board.me` property
-(or it's alias, :attr:`yatron.board.Board.m`).
+We can ask our coordinates using the :attr:`yatron.Board.me` property (or it's
+alias, :attr:`yatron.Board.m`).
 
     >>> me = board.me
     >>> me
     (1, 1)
 
-Similarly, we can use :attr:`yatron.board.Board.them` (and it's alias,
-:attr:`yatron.board.Board.t`).
+Similarly, we can use :attr:`yatron.Board.them` (and it's alias,
+:attr:`yatron.Board.t`).
 
     >>> them = board.them
     >>> them
@@ -67,39 +69,11 @@ coordinate on the boar like this:
 
 You can use the object's field markers for comparison:
 
-    >>> assert board.W == board.WALL  == '#'
-    >>> assert board.F == board.FLOOR == ' '
-    >>> assert board.M == board.ME    == '1'
-    >>> assert board.T == board.THEM  == '2'
-
-To redefine these markers for a board instance, you can pass a dictionary to
-it's `syntax` argument when creating the board:
-
-    >>> from yatron.board import Board
-    >>> syntax = {
-    ...     'WALL':  'X',
-    ...     'FLOOR': ' ',
-    ...     'ME':    'A',
-    ...     'THEM':  'B',
-    ... }
-    >>> data = (('X', 'X', 'X'),
-    ...         ('X', 'A', 'X'),
-    ...         ('X', ' ', 'X'),
-    ...         ('X', 'B', 'X'),
-    ...         ('X', 'X', 'X'))
-    >>> fancy = Board((3, 5), data, syntax=syntax)
-    >>> print fancy.board
-    XXX
-    XBX
-    X X
-    XAX
-    XXX
-
-    >>> fancy.ME
-    'A'
-
-    >>> fancy[fancy.them] == fancy.THEM
-    True
+    >>> assert all(((board.ME  == '1'),
+    ...     (board.THEM == '2'),
+    ...     (board.WALL == '#'),
+    ...     (board.FLOOR == ' '),
+    ... ))
 
 If we iterate over the board, it will yield it's blocks and coordinates:
 
@@ -115,7 +89,7 @@ If we iterate over the board, it will yield it's blocks and coordinates:
     # (4, 4)
 
 To check for possible moves from a certain position, we call
-:func:`yatron.board.Board.possibilities`.
+:func:`yatron.Board.possibilities`.
 
     >>> board.possibilities(me)
     ((1, 2), (2, 1))
@@ -124,15 +98,14 @@ To check for possible moves from a certain position, we call
     ((3, 2), (2, 3))
 
 To check the distance between us and the opponent, we can use the
-:attr:`yatron.board.Board.distance` property.
+:attr:`yatron.Board.distance` property.
 
     >>> board.distance
     3
 
 Let's try it with a more complex board:
 
-    >>> file = StringIO("""
-    ... 7 5
+    >>> bfile = StringIO("""7 5
     ... #######
     ... #   #2#
     ... # # # #
@@ -140,14 +113,13 @@ Let's try it with a more complex board:
     ... #######
     ... """)
 
-    >>> board = plaintext(file)
+    >>> board = generate().next()
     >>> board.distance
     9
 
 Or an even more complex one:
 
-    >>> file = StringIO("""
-    ... 14 10
+    >>> bfile = StringIO("""14 10
     ... ##############
     ... #            #
     ... #          2 #
@@ -160,14 +132,13 @@ Or an even more complex one:
     ... ##############
     ... """)
 
-    >>> board = plaintext(file)
+    >>> board = generate().next()
     >>> board.distance
     13
 
 Let's try an isolated board:
 
-    >>> file = StringIO("""
-    ... 14 10
+    >>> bfile = StringIO("""14 10
     ... ##############
     ... ###         ##
     ... #  #    #  2 #
@@ -180,7 +151,7 @@ Let's try an isolated board:
     ... ##############
     ... """)
 
-    >>> board = plaintext(file)
+    >>> board = generate().next()
     >>> board.distance
     -1
 
@@ -197,8 +168,7 @@ left:
 
 If the two players are adjacent, the result is zero.
 
-    >>> file = StringIO("""
-    ... 14 10
+    >>> bfile = StringIO("""7 6
     ... #######
     ... #     #
     ... #  2  #
@@ -207,18 +177,17 @@ If the two players are adjacent, the result is zero.
     ... #######
     ... """)
 
-    >>> board = plaintext(file)
-    >>> board.distance
+    >>> xboard = generate().next()
+    >>> xboard.distance
     0
 
 To calculate one of the shortest paths between us and the opponent, we can use
-the :attr:`yatron.board.Board.path` property.
+the :attr:`yatron.Board.path` property.
 
     >>> board.path
     ()
 
-    >>> file = StringIO("""
-    ... 14 10
+    >>> bfile = StringIO("""14 10
     ... ##############
     ... ###         ##
     ... #  #    #  2 #
@@ -231,12 +200,12 @@ the :attr:`yatron.board.Board.path` property.
     ... ##############
     ... """)
 
-    >>> board = plaintext(file)
+    >>> board = generate().next()
     >>> board.path
     ((2, 3), (2, 4), (2, 5), ..., (10, 5), (10, 6), (10, 7))
 
 To get directions for an adjacent coordinate, call
-:meth:`yatron.board.Board.direction`.
+:meth:`yatron.Board.direction`.
 
     >>> board.direction((2, 3))
     1

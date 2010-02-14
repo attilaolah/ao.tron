@@ -1,30 +1,134 @@
+import os
+import sys
+
+
+DIRECTIONS = (NORTH, EAST, SOUTH, WEST) = (N, S, E, W) = 1, 2, 3, 4
+
+ME    = '1'
+THEM  = '2'
+FLOOR = ' '
+WALL  = '#'
+
+
+def move(direction):
+    print direction
+    sys.stdout.flush()
+
+
+def invalid(message):
+    """You do not need to call this function directly."""
+
+    print >> sys.stderr, 'Invalid input: %s' % message
+    sys.exit(1)
+
+
+def readline(buf):
+    """You do not need to call this function directly."""
+
+    while not '\n' in buf:
+        tmp = os.read(0, 1024)
+        if not tmp:
+            break
+        buf += tmp
+
+    if not buf.strip():
+        return None, buf
+
+    if not '\n' in buf:
+        invalid('unexpected EOF after \'%s\'' % buf)
+
+    index = buf.find('\n')
+    line = buf[0:index]
+    rest = buf[index + 1:]
+
+    return line, rest
+
+
+def read(buf):
+    """You do not need to call this function directly."""
+
+    meta, buf = readline(buf)
+
+    if not meta:
+        return None, buf
+
+    dim = meta.split(' ')
+
+    if len(dim) != 2:
+        invalid('expected dimensions on first line')
+
+    try:
+        width, height = int(dim[0]), int(dim[1])
+    except ValueError:
+        invalid('malformed dimensions on first line')
+
+    lines = []
+
+    while len(lines) != height:
+        line, buf = readline(buf)
+        if not line:
+            invalid('unexpected EOF reading board')
+        lines.append(line)
+
+    board = [line[:width] for line in lines]
+
+    (len(board) != height or any(len(board[y]) != width for y in xrange(
+        height))) and invalid('malformed board')
+
+    board = tuple(reversed([tuple(line) for line in board]))
+
+    return Board((width, height), board), buf
+
+
+def generate():
+    """Generate board objects, once per turn.
+
+    This method returns a generator which you may iterate over.
+    Make sure to call tron.move() exactly once for every board
+    generated, or your bot will not work.
+
+    """
+
+    buf = ''
+
+    while True:
+        board, buf = read(buf)
+        if board is None:
+            break
+
+        yield board
+
+    if buf.strip():
+        invalid('garbage after last board: %s' % buf)
+
+
 class Board(object):
-    """Representation of the current state of the tron board."""
+    """The Tron Board.
 
-    # Default constants:
-    W = WALL  = '#'
-    F = FLOOR = ' '
-    M = ME    = '1'
-    T = THEM  = '2'
+    The recommended way to use this class is as follows:
 
-    # Directions:
-    NORTH = 1
-    EAST  = 2
-    SOUTH = 3
-    WEST  = 4
-    DIRECTIONS = (NORTH, EAST, SOUTH, WEST)
+        def which_move(board):
+            # figure this part out yourself
+            return tron.NORTH
 
-    def __init__(self, dimensions, lines, syntax=None):
-        # Set up dimensions and lines (with height and withd for convenience):
+        for board in tron.Board.generate():
+            tron.move(which_move(board))
+
+    Feel free to add stuff to this class.
+    """
+
+    # Copy the module-level constants to the board class for convenience:
+    DIRECTIONS = (NORTH, EAST, SOUTH, WEST) = (N, S, E, W) = DIRECTIONS
+    ME, THEM, WALL, FLOOR = ME, THEM, WALL, FLOOR
+
+    # Also copy the move function:
+    move = staticmethod(move)
+
+    def __init__(self, dimensions, data):
+        # Set up dimensions and data (with height and withd for convenience):
         self.dimensions = \
-            self.height, self.width = dimensions
-        self.lines = lines
-        # Set up custom syntax if supplied:
-        if syntax is not None:
-            self.W = self.WALL  = syntax['WALL']
-            self.F = self.FLOOR = syntax['FLOOR']
-            self.M = self.ME    = syntax['ME']
-            self.T = self.THEM  = syntax['THEM']
+            self.width, self.height = dimensions
+        self.data = data
         # Set up some lazyness for the properties:
         self.__board = \
             self.__me = \
@@ -37,7 +141,7 @@ class Board(object):
         """Returns the tron board in plain text. Useful for debugging."""
         if self.__board is None:
             self.__board = '\n'.join(reversed([
-                ''.join(line) for line in self.lines]))
+                ''.join(line) for line in self.data]))
         return self.__board
 
     def __repr__(self):
@@ -46,20 +150,20 @@ class Board(object):
 
     def __iter__(self):
         """Iterates over the board, yielding block values and coordinates."""
-        for y, line in enumerate(self.lines):
+        for y, line in enumerate(self.data):
             for x, block in enumerate(line):
                 yield block, (x, y)
 
     def __getitem__(self, coords):
         """Returns the block with coordinates."""
-        return self.lines[coords[1]][coords[0]]
+        return self.data[coords[1]][coords[0]]
 
     @property
     def me(self):
         """Returns the coordinates of `ME` on the board."""
         if self.__me is None:
             for block, coords in self:
-                if block == self.ME:
+                if block == ME:
                     self.__me = coords
                     break
         return self.__me
@@ -70,21 +174,28 @@ class Board(object):
         """Returns coordinates of `THEM` on the board."""
         if self.__them is None:
             for block, coords in self:
-                if block == self.THEM:
+                if block == THEM:
                     self.__them = coords
                     break
         return self.__them
     t = them
 
+    def surround(self, coords):
+        """Returns the four surrounding blocks for `doords`."""
+        x, y = coords
+        return ((x, y+1), (x+1, y), (x, y-1), (x-1, y))
+
+
     def possibilities(self, coords):
         """Returns the coordinates of spaces around `coords`."""
         x, y = coords
-        area = ((x, y+1), (x+1, y), (x, y-1), (x-1, y))
-        return tuple(block for block in area if self[block] == self.FLOOR)
+        return tuple(block for block in self.surround(
+            coords) if self[block] == FLOOR)
 
     def direction(self, coords):
         """Returns the direction to go the the adjacent `coords`."""
-        return self.possibilities(self.me).index(coords) + 1
+        if coords in self.surround(self.me):
+            return self.surround(self.me).index(coords) + 1
 
     @property
     def distance(self):
@@ -96,8 +207,7 @@ class Board(object):
 
         """
         if self.__distance is None:
-            x, y = self.me
-            if self.them in ((x, y-1), (x, y+1), (x-1, y), (x+1, y)):
+            if self.them in self.surround(self.me):
                 # We're adjacent; set cache to zero and path to empty.
                 self.__distance, self.__path = 0, ()
                 return 0
