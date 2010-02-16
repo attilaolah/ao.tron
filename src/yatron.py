@@ -18,71 +18,6 @@ def move(direction):
     sys.stdout.flush()
 
 
-def invalid(message):
-    """You do not need to call this function directly."""
-
-    print >> sys.stderr, 'Invalid input: %s' % message
-    sys.exit(1)
-
-
-def readline(buf):
-    """You do not need to call this function directly."""
-
-    while not '\n' in buf:
-        tmp = os.read(0, 1024)
-        if not tmp:
-            break
-        buf += tmp
-
-    if not buf.strip():
-        return None, buf
-
-    if not '\n' in buf:
-        invalid('unexpected EOF after \'%s\'' % buf)
-
-    index = buf.find('\n')
-    line = buf[0:index]
-    rest = buf[index + 1:]
-
-    return line, rest
-
-
-def read(buf):
-    """You do not need to call this function directly."""
-
-    meta, buf = readline(buf)
-
-    if not meta:
-        return None, buf
-
-    dim = meta.split(' ')
-
-    if len(dim) != 2:
-        invalid('expected dimensions on first line')
-
-    try:
-        width, height = int(dim[0]), int(dim[1])
-    except ValueError:
-        invalid('malformed dimensions on first line')
-
-    lines = []
-
-    while len(lines) != height:
-        line, buf = readline(buf)
-        if not line:
-            invalid('unexpected EOF reading board')
-        lines.append(line)
-
-    board = [line[:width] for line in lines]
-
-    (len(board) != height or any(len(board[y]) != width for y in xrange(
-        height))) and invalid('malformed board')
-
-    board = tuple(reversed([tuple(line) for line in board]))
-
-    return Board((width, height), board), buf
-
-
 def generate():
     """Generate board objects, once per turn.
 
@@ -93,38 +28,21 @@ def generate():
     """
 
     while True:
-        #dimensions = stdin.readline()
-        #if not dimensions:
-        #    # Check for end of input
-        #    raise StopIteration
-        #while not dimensions.strip():
-        #    # Strip empty lines
-        #    dimensions = infile.readline()
+
+        # Read until we hit an empty string:
         line, lines = sys.stdin.readline(), []
         if line == '':
             break
+
+        # Extract the dimensions:
         width, height = map(int, line[:-1].split())
+
+        # Generate board lines:
         for i in xrange(height):
             lines.append(tuple(sys.stdin.readline()[:width]))
 
-        # Yield a new Board object for each iteration
+        # Yield a new Board object for each iteration:
         yield Board((width, height), tuple(reversed(lines)))
-
-
-
-    # XXX
-
-#    buf = ''
-#
-#    while True:
-#        board, buf = read(buf)
-#        if board is None:
-#            break
-#
-#        yield board
-#
-#    if buf.strip():
-#        invalid('garbage after last board: %s' % buf)
 
 
 class Board(object):
