@@ -1,5 +1,5 @@
 Reading the board from a file
-=============================
+-----------------------------
 
 :func:`yatron.generate` is a simple function that reads the tron board from
 the standard input and and generates :class:`yatron.Board` instances. Format
