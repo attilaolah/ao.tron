@@ -46,19 +46,7 @@ def generate():
 
 
 class Board(object):
-    """The Tron Board.
-
-    The recommended way to use this class is as follows:
-
-        def which_move(board):
-            # figure this part out yourself
-            return tron.NORTH
-
-        for board in tron.Board.generate():
-            tron.move(which_move(board))
-
-    Feel free to add stuff to this class.
-    """
+    """The Tron Board."""
 
     # Copy the module-level constants to the board class for convenience:
     DIRECTIONS = (NORTH, EAST, SOUTH, WEST) = (N, S, E, W) = DIRECTIONS
@@ -86,61 +74,81 @@ class Board(object):
     @property
     def board(self):
         """Returns the tron board in plain text. Useful for debugging."""
+
         if self.__board is None:
             self.__board = '\n'.join(reversed([
                 ''.join(line) for line in self.data]))
+
         return self.__board
 
     def __repr__(self):
         """Useful when debugging."""
+
         return '<Board (%dx%d)>' % self.dimensions
 
     def __iter__(self):
         """Iterates over the board, yielding block values and coordinates."""
+
         for y, line in enumerate(self.data):
             for x, block in enumerate(line):
                 yield block, (x, y)
 
     def __getitem__(self, coords):
         """Returns the block with coordinates."""
+
         return self.data[coords[1]][coords[0]]
 
     @property
     def me(self):
         """Returns the coordinates of `ME` on the board."""
+
+        # Check for cached value:
         if self.__me is None:
             for block, coords in self:
                 if block == ME:
                     self.__me = coords
                     break
+
+        # Return cached value:
         return self.__me
+
     m = me
 
     @property
     def them(self):
         """Returns coordinates of `THEM` on the board."""
+
+        # Check for cached value:
         if self.__them is None:
             for block, coords in self:
                 if block == THEM:
                     self.__them = coords
                     break
+
+        # Return cached value:
         return self.__them
+
     t = them
 
     def surround(self, coords):
         """Returns the four surrounding blocks for `doords`."""
+
         x, y = coords
+
         return ((x, y+1), (x+1, y), (x, y-1), (x-1, y))
 
 
     def possibilities(self, coords):
         """Returns the coordinates of spaces around `coords`."""
+
         x, y = coords
+
         return tuple(block for block in self.surround(
             coords) if self[block] == FLOOR)
 
     def direction(self, coords):
         """Returns the direction to go the the adjacent `coords`."""
+
         if coords in self.surround(self.me):
             # XXX This is not compatible with Python 2.5, so we work it around:
             # return self.surround(self.me).index(coords) + 1
@@ -156,20 +164,27 @@ class Board(object):
         minus one.
 
         """
+
+        # Check for cached value:
         if self.__distance is None:
+
             if self.them in self.surround(self.me):
                 # We're adjacent; set cache to zero and path to empty.
                 self.__distance, self.__path = 0, ()
                 return 0
+
             borders = self.possibilities(self.them)
             fields, flood, levels, counter, space = [self.me], [], [], 1, 0
+
             while True:
                 next = []
                 for field in fields:
                     for x in self.possibilities(field):
                         if x in borders:
+
                             # Fond the enemy: set cache to counter value.
                             self.__distance = counter
+
                             # Also set the shortest path
                             levels.reverse()
                             path = [x]
@@ -179,13 +194,16 @@ class Board(object):
                                         path.append(field)
                                         continue
                             self.__path = tuple(reversed(path))
+
                             # Return the current distance.
                             return counter
                         if x not in flood:
                             flood.append(x)
                             next.append(x)
+
                 counter += 1
                 space += len(next)
+
                 if next == []:
                     # No more spaces left: we are isolated; set up path cache.
                     self.__distance, self.__path = -1, ()
@@ -193,8 +211,11 @@ class Board(object):
                     self.space = space
                     # Return -1 to indicate isolation.
                     return -1
+
                 levels.append(next)
                 fields = next
+
+        # Return the cached value:
         return self.__distance
 
     @property
@@ -210,8 +231,12 @@ class Board(object):
         This is just a cheap call to see if we're far away on a huge map.
 
         """
+
+        # Check for cached value:
         if self.__flight is None:
             self.__flight = sum(map(abs, map(sub, self.me, self.them)))
+
+        # Return the cached value:
         return self.__flight
 
     @property
@@ -224,8 +249,11 @@ class Board(object):
 
         """
 
+        # Check for cached value:
         if self.__chase is None:
             self.__chase = self.path and self.path[0] or None
+
+        # Return the cached value:
         return self.__chase
 
     @property
@@ -239,15 +267,18 @@ class Board(object):
 
         """
 
+        # Check for cached value:
         if self.__charge is None:
             x, y = self.me
             xl, yl = map(lt, self.me, self.them)
+
             fields = {
                 (True, True): ((x+1, y), (x, y+1), (x, y-1), (x-1, y)),
                 (True, False): ((x+1, y), (x, y-1), (x-1, y), (x, y+1)),
                 (False, True): ((x-1, y), (x, y+1), (x+1, y), (x, y-1)),
                 (False, False): ((x-1, y), (x, y-1), (x+1, y), (x, y+1)),
             }[xl, yl]
+
             for field in fields:
                 if field in self.possibilities(self.me):
                     self.__charge = field
@@ -256,8 +287,11 @@ class Board(object):
             # It looks like we're trapped, so let's return None.
             self.__charge = -1
             return None
+
         if self.__charge == -1:
             return None
+
+        # Return the cached value:
         return self.__charge
 
     @property
@@ -270,15 +304,18 @@ class Board(object):
 
         """
 
+        # Check for cached value:
         if self.__flee is None:
             x, y = self.me
             xg, yg = map(gt, self.me, self.them)
+
             fields = {
                 (True, True): ((x+1, y), (x, y+1), (x, y-1), (x-1, y)),
                 (True, False): ((x+1, y), (x, y-1), (x-1, y), (x, y+1)),
                 (False, True): ((x-1, y), (x, y+1), (x+1, y), (x, y-1)),
                 (False, False): ((x-1, y), (x, y-1), (x+1, y), (x, y+1)),
             }[xg, yg]
+
             for field in fields:
                 if field in self.possibilities(self.me):
                     self.__flee = field
@@ -287,12 +324,16 @@ class Board(object):
             # It looks like we're trapped, so let's return None.
             self.__flee = -1
             return None
+
         if self.__flee == -1:
             return None
+
+        # Return the cached value:
         return self.__flee
 
     @property
     def random(self):
         """Returns a random valid move."""
+
         return self.possibilities(self.me) and random.choice(
             self.possibilities(self.me)) or self.surround(self.me)[0]
