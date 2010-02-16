@@ -1,22 +1,20 @@
 The tron board
-==============
+--------------
 
 The class :class:`yatronBoard` represents the state of the tron board in
 discrete time. It has some utility functions to make it easier for your bot
 to work with the board object. To construct a simple board object, we'll use
 the :func:`yatron.generate` generator.
 
+    >>> import sys
     >>> from StringIO import StringIO
-    >>> bfile = StringIO("""5 5
+    >>> sys.stdin = StringIO("""5 5
     ... #####
     ... #  2#
     ... #   #
     ... #1  #
     ... #####
     ... """)
-
-    >>> import os
-    >>> os.read = lambda fd, n: bfile.read(n)
 
     >>> from yatron import generate
     >>> board = generate().next()
@@ -105,7 +103,7 @@ To check the distance between us and the opponent, we can use the
 
 Let's try it with a more complex board:
 
-    >>> bfile = StringIO("""7 5
+    >>> sys.stdin = StringIO("""7 5
     ... #######
     ... #   #2#
     ... # # # #
@@ -119,7 +117,7 @@ Let's try it with a more complex board:
 
 Or an even more complex one:
 
-    >>> bfile = StringIO("""14 10
+    >>> sys.stdin = StringIO("""14 10
     ... ##############
     ... #            #
     ... #          2 #
@@ -138,7 +136,7 @@ Or an even more complex one:
 
 Let's try an isolated board:
 
-    >>> bfile = StringIO("""14 10
+    >>> sys.stdin = StringIO("""14 10
     ... ##############
     ... ###         ##
     ... #  #    #  2 #
@@ -168,7 +166,7 @@ left:
 
 If the two players are adjacent, the result is zero.
 
-    >>> bfile = StringIO("""7 6
+    >>> sys.stdin = StringIO("""7 6
     ... #######
     ... #     #
     ... #  2  #
@@ -177,8 +175,8 @@ If the two players are adjacent, the result is zero.
     ... #######
     ... """)
 
-    >>> xboard = generate().next()
-    >>> xboard.distance
+    >>> board = generate().next()
+    >>> board.distance
     0
 
 To calculate one of the shortest paths between us and the opponent, we can use
@@ -187,7 +185,7 @@ the :attr:`yatron.Board.path` property.
     >>> board.path
     ()
 
-    >>> bfile = StringIO("""14 10
+    >>> sys.stdin = StringIO("""14 10
     ... ##############
     ... ###         ##
     ... #  #    #  2 #

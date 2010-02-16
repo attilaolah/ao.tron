@@ -27,21 +27,18 @@ To use the function, in your source file you can do something like this:
         # do your stuff here
         move(board.NORTH)
 
-For testing, we'll create a file-like object to demonstrate how it works:
+For testing, we'll create a file-like object and mangle sys.stdin to
+demonstrate how it works:
 
+    >>> import sys
     >>> from StringIO import StringIO
-    >>> bfile = StringIO("""5 5
+    >>> sys.stdin = StringIO("""5 5
     ... #####
     ... #  2#
     ... #   #
     ... #1  #
     ... #####
     ... """)
-
-Now we mangle os.read to read from our file-like object instead:
-
-    >>> import os
-    >>> os.read = lambda fd, n: bfile.read(n)
 
 Now we can use the board generator as usual:
 
@@ -50,7 +47,7 @@ Now we can use the board generator as usual:
     >>> board
     <Board (5x5)>
 
-    >>> bfile = StringIO("""5 5
+    >>> sys.stdin = StringIO("""5 5
     ... #####
     ... #  2#
     ... #   #

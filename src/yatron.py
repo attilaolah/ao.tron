@@ -92,7 +92,6 @@ def generate():
 
     """
 
-    from sys import stdin
     while True:
         #dimensions = stdin.readline()
         #if not dimensions:
@@ -101,9 +100,13 @@ def generate():
         #while not dimensions.strip():
         #    # Strip empty lines
         #    dimensions = infile.readline()
-        (width, height), lines = map(int, stdin.readline().split()), []
+        line, lines = sys.stdin.readline(), []
+        if line == '':
+            break
+        width, height = map(int, line[:-1].split())
         for i in xrange(height):
-            lines.append(tuple(stdin.readline()[:width]))
+            lines.append(tuple(sys.stdin.readline()[:width]))
+
         # Yield a new Board object for each iteration
         yield Board((width, height), tuple(reversed(lines)))
 
