@@ -1,0 +1,1 @@
+.. include:: ../../src/ao/tron/input.txt

@@ -3,15 +3,16 @@ from setuptools import find_packages, setup
 
 setup(
     # Package information:
-    name='yatron',
+    name='ao.tron',
     version='1.0.0',
     license='GNU GPL',
-    url='http://github.com/aatiis/python-yatron',
+    url='http://github.com/aatiis/ao.tron',
     description='Tron board and utilities.',
-    long_description='%s\n\n%s'%(
-        open('README.txt').read(),
+    long_description=\
+        open('README.txt').read() + \
+        open(os.path.join('src', 'ao', 'tron', 'board.txt')).read() + \
+        open(os.path.join('src', 'ao', 'tron', 'input.txt')).read() + \
         open('CHANGES.txt').read(),
-    ),
     # Author information:
     author='Attila Olah',
     author_email='attilaolah@gmail.com',
@@ -33,8 +34,8 @@ setup(
         ),
     },
     # Classifiers:
-    classifiers=(
-        'Development Status :: 3 - Alpha',
+    classifiers=[
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Framework :: Buildout',
         'Intended Audience :: Education',
@@ -44,8 +45,11 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
         'Topic :: Education',
         'Topic :: Games/Entertainment',
         'Topic :: Games/Entertainment :: Simulation',
-    ),
+    ],
 )

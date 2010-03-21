@@ -1,8 +1,7 @@
 import os
+import operator
 import random
 import sys
-
-from operator import gt, lt, sub
 
 
 DIRECTIONS = (NORTH, EAST, SOUTH, WEST) = (N, S, E, W) = 1, 2, 3, 4
@@ -234,7 +233,7 @@ class Board(object):
 
         # Check for cached value:
         if self.__flight is None:
-            self.__flight = sum(map(abs, map(sub, self.me, self.them)))
+            self.__flight = sum(map(abs, map(operator.sub, self.me, self.them)))
 
         # Return the cached value:
         return self.__flight
@@ -270,7 +269,7 @@ class Board(object):
         # Check for cached value:
         if self.__charge is None:
             x, y = self.me
-            xl, yl = map(lt, self.me, self.them)
+            xl, yl = map(operator.lt, self.me, self.them)
 
             fields = {
                 (True, True): ((x+1, y), (x, y+1), (x, y-1), (x-1, y)),
@@ -307,7 +306,7 @@ class Board(object):
         # Check for cached value:
         if self.__flee is None:
             x, y = self.me
-            xg, yg = map(gt, self.me, self.them)
+            xg, yg = map(operator.gt, self.me, self.them)
 
             fields = {
                 (True, True): ((x+1, y), (x, y+1), (x, y-1), (x-1, y)),

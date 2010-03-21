@@ -1,9 +1,9 @@
 Reading the board from a file
 -----------------------------
 
-:func:`yatron.generate` is a simple function that reads the tron board from
-the standard input and and generates :class:`yatron.Board` instances. Format
-the input like this:
+``ao.tron.generate`` is a simple function that reads the tron board from
+the standard input and and generates ``ao.tron.Board`` instances. Format
+the input like this::
 
     5 5
     #####
@@ -13,22 +13,22 @@ the input like this:
     #####
 
 The numbers on the first line show the height and withd of the board,
-respectively. The following lines represent the board, where:
+respectively. The following lines represent the board, where::
 
 * `"#"` are walls
 * `" "` (whitespaces) are the floor
 * `"1"` is our player
 * `"2"` is the opponent
 
-To use the function, in your source file you can do something like this:
+To use the function, in your source file you can do something like this::
 
-    from yatron import generate, move
+    from ao.tron import generate, move
     for board  in generate():
         # do your stuff here
         move(board.NORTH)
 
 For testing, we'll create a file-like object and mangle sys.stdin to
-demonstrate how it works:
+demonstrate how it works::
 
     >>> import sys
     >>> from StringIO import StringIO
@@ -40,9 +40,9 @@ demonstrate how it works:
     ... #####
     ... """)
 
-Now we can use the board generator as usual:
+Now we can use the board generator as usual::
 
-    >>> from yatron import generate
+    >>> from ao.tron import generate
     >>> board = generate().next()
     >>> board
     <Board (5x5)>
@@ -71,8 +71,15 @@ Now we can use the board generator as usual:
     <Board (4x4)>
     <Board (4x4)>
 
-To make a move, we can use the :meth:`yatron.board.move` method, which is an
-alias for the module-global :func:`yatron.move` function.
+To make a move, we can use the ``ao.tron.board.move`` method, which is an
+alias for the module-global ``ao.tron.move`` function::
 
     >>> board.move(board.NORTH)
     1
+
+Clean up after the tests::
+
+    >>> from zope.testing import cleanup
+    >>> cleanup.cleanUp()
+
+
