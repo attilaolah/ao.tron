@@ -1,13 +1,17 @@
-# ignore dot-files
+# dot-files and temporary files
 .*
+*~
+*.orig
 
 # ignore python source files
 *.py[co]
 
 # ignore files created by buildout
 .installed.cfg
-bin/
-develop-eggs/
-eggs/
-parts/
-src/ao.tron.egg-info/
+bin
+build
+develop-eggs
+dist
+eggs
+parts
+src/ao.tron.egg-info

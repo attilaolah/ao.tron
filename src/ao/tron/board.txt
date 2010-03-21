@@ -216,7 +216,7 @@ Thus, if we want to head towards the enemy, we can easily get directions::
     True
 
 The absolute distance between us and the enemy can be accessed with the
-``ao.tron.Board.flight`` property::
+``ao.tron.Board.flight`` property.
 
 Note that walls are not taken account of. We may even be separated. This is
 just a cheap call to see if we're far away on a huge map::
@@ -227,7 +227,7 @@ just a cheap call to see if we're far away on a huge map::
 The accurate way to go in the enemys direction is to to access the
 ``ao.tron.Board.chase`` property. Note that this will call ``ao.tron.Board.path``,
 which may be quite expensive on huge boards. Use it with caution. If you need
-a cheaper version, try ``ao.tron.Board.charge``.
+a cheaper version, try ``ao.tron.Board.charge``::
 
     >>> board.chase
     (2, 3)
